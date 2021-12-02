@@ -2,11 +2,14 @@ package com.algaworks.osworks.api.controller;
 
 import com.algaworks.osworks.domain.model.Cliente;
 import com.algaworks.osworks.domain.repository.ClienteRepository;
+import com.algaworks.osworks.domain.service.CadastroClienteService;
 import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +18,11 @@ import java.util.Optional;
 public class ClienteController {
 
     private final ClienteRepository clienteRepository;
+    private final CadastroClienteService cadastroCliente;
 
-    public ClienteController(ClienteRepository clienteRepository) {
+    public ClienteController(ClienteRepository clienteRepository, CadastroClienteService cadastroCliente) {
         this.clienteRepository = clienteRepository;
+        this.cadastroCliente = cadastroCliente;
     }
 
     @GetMapping
@@ -35,19 +40,20 @@ public class ClienteController {
     }
 
     @PostMapping
+    @Valid
     @ResponseStatus(HttpStatus.CREATED)
-    public Cliente adicionar(@RequestBody Cliente cliente) {
-        return clienteRepository.save(cliente);
+    public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
+        return cadastroCliente.salvar(cliente);
     }
 
     @PutMapping("/{clienteId}")
-    public ResponseEntity<Cliente> atualizar(@PathVariable Long clienteId,
+    public ResponseEntity<Cliente> atualizar(@Valid @PathVariable Long clienteId,
                                              @RequestBody Cliente cliente) {
         if (!clienteRepository.existsById(clienteId)) {
             return ResponseEntity.notFound().build();
         }
         cliente.setId(clienteId);
-        clienteRepository.save(cliente);
+        cadastroCliente.salvar(cliente);
         return ResponseEntity.ok(cliente);
     }
 
@@ -56,7 +62,7 @@ public class ClienteController {
         if (!clienteRepository.existsById(clienteId)) {
             return ResponseEntity.notFound().build();
         }
-        clienteRepository.deleteById(clienteId);
+        cadastroCliente.excluir(clienteId);
         return ResponseEntity.noContent().build();
     }
 

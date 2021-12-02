@@ -1,6 +1,7 @@
 package com.algaworks.osworks.domain.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.Objects;
 
 @Entity
@@ -9,9 +10,17 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Você não pode deixar o campo de nome em branco!")
+    @Size(max = 60)
     private String nome;
+
+    @NotBlank(message = "Você não pode deixar o campo de e-mail em branco!")
+    @Email
+    @Size(max = 255)
     private String email;
 
+    @NotBlank(message = "Você não pode deixar o campo de telefone em branco!")
+    @Size(max = 20)
     @Column(name = "fone")
     private String telefone;
 
